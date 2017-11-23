@@ -1,23 +1,100 @@
-#/srv/gitlab/data	/var/opt/gitlab	For storing application data
-#/srv/gitlab/logs	/var/log/gitlab	For storing logs
-#/srv/gitlab/config	/etc/gitlab	For storing the GitLab configuration file
-# https://docs.gitlab.com/omnibus/docker/
-web:
-  image: 'gitlab/gitlab-ce:latest'
-  restart: always
-  hostname: 'gitlab.example.com'
-  environment:
-    GITLAB_OMNIBUS_CONFIG: |
-      external_url 'https://gitlab.example.com'
-  ports:
-    - '80:80'
-    - '443:443'
-    - '22:22'
-  volumes:
-    - '/srv/gitlab/config:/etc/gitlab'
-    - '/srv/gitlab/logs:/var/log/gitlab'
-    - '/srv/gitlab/data:/var/opt/gitlab'
+version: '2'
 
+services:
+  gitlab:
+#    restart: always
+    image: 'gitlab/gitlab-ce:latest'
+    ports:
+      - "80:80"
+      - "443:443"
+      - "22:22"
+      - "5005:5005"
+    networks:
+      prodnetwork:
+        aliases:
+          - gitlab.dev.gaio.local
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.dev.gaio.local'
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
 
-/srv/gitlab/config/ssl/gitlab.example.com.crt
-/srv/gitlab/config/ssl/gitlab.example.com.key
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    networks:
+      prodnetwork:
+        aliases:
+          - gitlab-runner.dev.gaio.local
+    volumes:
+      - ./gitlab-runner/config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  nexus:
+    image: sonatype/nexus
+    ports:
+      - "8081:8081"
+    networks:
+      prodnetwork:
+        aliases:
+          - nexus.dev.gaio.local
+    environment:
+      - CONTEXT_PATH=/nexus
+    volumes:
+      # chown -R 200 ./var/nexus important, commencer par créer le dossier !
+      - ./nexus:/sonatype-work
+
+  # https://docs.docker.com/registry/deploying/
+  registry:
+    image: registry
+    ports:
+      - "5000:5000"
+    networks:
+      prodnetwork:
+        aliases:
+          - registry.dev.gaio.local
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+    volumes:
+      - ./registry:/var/lib/registry
+
+  sonarqube:
+    image: sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      prodnetwork:
+        aliases:
+          - sonar.dev.gaio.local
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://db:5432/sonar
+    volumes:
+      - ./sonarqube/conf:/opt/sonarqube/conf
+      - ./sonarqube/data:/opt/sonarqube/data
+      - ./sonarqube/extensions:/opt/sonarqube/extensions
+      - ./sonarqube/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+  db:
+    image: postgres
+    networks:
+      - prodnetwork
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    volumes:
+      - ./postgresql:/var/lib/postgresql
+      # This needs explicit mapping due to https://github.com/docker-library/postgres/blob/4e48e3228a30763913ece952c611e5e9b95c8759/Dockerfile.template#L52
+      - ./postgresql/data:/var/lib/postgresql/data
+
+networks:
+  prodnetwork:
+    driver: bridge
+
+#volumes:#
+  #sonarqube_conf:
+  #sonarqube_data:
+  #sonarqube_extensions:
+  #sonarqube_bundled-plugins:
+  #"postgresql:
+#  postgresql_data:
