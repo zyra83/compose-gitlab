@@ -1,0 +1,40 @@
+version: '2'
+services:
+  wekan:
+    image: wekanteam/wekan:latest
+    links:
+      - wekandb
+    environment:
+      - MONGO_URL=mongodb://wekandb/wekan
+      - ROOT_URL=http://127.0.0.1:8080
+    ports:
+      - "8080:80"
+  wekandb:
+    image: mongo:3.2.14
+    volumes:
+      - ./var/wekan/db:/data/db
+  gogs:
+    image: gogs/gogs
+    volumes:
+      - ./var/gogs:/data
+    ports:
+      - "10080:3000"
+      - "10022:22"
+  nexus:
+    image: sonatype/nexus
+    volumes:
+#      chown -R 200 ./var/nexus
+      - ./var/nexus:/sonatype-work
+    ports:
+      - "8081:8081"
+    environment:
+      - CONTEXT_PATH=/
+# https://docs.docker.com/registry/deploying/
+  registry:
+    image: registry
+    volumes:
+      - ./var/registry:/var/lib/registry
+    ports:
+      - "5000:5000"
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
