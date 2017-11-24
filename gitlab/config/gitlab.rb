@@ -1016,8 +1016,8 @@ external_url 'https://gitlab.example.com'
 ################################################################################
 
 ##! Define to enable GitLab Pages
-pages_external_url "http://pages.example.com/"
-# gitlab_pages['enable'] = false
+pages_external_url "https://pages.example.com/"
+gitlab_pages['enable'] = true
 
 ##! Configure to expose GitLab Pages on external IP address, serving the HTTP
 # gitlab_pages['external_http'] = []
@@ -1046,7 +1046,22 @@ pages_external_url "http://pages.example.com/"
 # You just have to change the key "nginx['some_settings']" with "pages_nginx['some_settings']"
 
 # Below you can find settings that are exclusive to "GitLab Pages NGINX"
-# pages_nginx['enable'] = false
+pages_nginx['enable'] = true
+# pages_nginx['client_max_body_size'] = '250m'
+pages_nginx['redirect_http_to_https'] = true
+# pages_nginx['redirect_http_to_https_port'] = 80
+
+##! Most root CA's are included by default
+# pages_nginx['ssl_client_certificate'] = "/etc/gitlab/ssl/ca.crt"
+
+# pages_nginx['ssl_certificate'] = "/etc/gitlab/ssl/#{node['fqdn']}.crt"
+pages_nginx['ssl_certificate'] = "/etc/gitlab/ssl/pages.example.com.crt"
+# pages_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/#{node['fqdn']}.key"
+pages_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/pages.example.com.key"
+
+
+
+
 
 # gitlab_rails['pages_path'] = "/mnt/storage/pages"
 
