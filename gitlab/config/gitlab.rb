@@ -10,7 +10,7 @@
 ##! URL on which GitLab will be reachable.
 ##! For more details on configuring external_url see:
 ##! https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab
-external_url 'https://gitlab.exemple.com'
+external_url 'https://gitlab.example.com'
 
 ## Roles for multi-instance GitLab
 ##! The default is to have no roles enabled, which results in GitLab running as an all-in-one instance.
@@ -1016,7 +1016,7 @@ external_url 'https://gitlab.exemple.com'
 ################################################################################
 
 ##! Define to enable GitLab Pages
-# pages_external_url "http://pages.example.com/"
+pages_external_url "http://pages.example.com/"
 # gitlab_pages['enable'] = false
 
 ##! Configure to expose GitLab Pages on external IP address, serving the HTTP
