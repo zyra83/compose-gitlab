@@ -57,3 +57,12 @@ openssl req -new -key pages.example.com.key -out pages.example.com.csr
 openssl x509 -req -in pages.example.com.csr -out pages.example.com.crt -CA ca.crt -CAkey ca.key -CAcreateserial -days 365
 
 
+
+# activation de mattermost
+
+Duplication des certificats gitlab.example.com en mattemrost.example.com pour éviter des configurations supplémentaires 
+(spécifier le chemin du certif dans nginx mattemrost et du coup ça hébrerge le mattermost déparement du gitlab, c'est pas ce que je veux ici, c'est trop lourd pour mon serveur.
+https://forum.mattermost.org/t/gitlab-mattermost-token-request-failed/824/6
+à moins d'ajouter le certificat au niveau systeme ça déconne...
+
+

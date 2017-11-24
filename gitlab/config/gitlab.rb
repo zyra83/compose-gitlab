@@ -1079,7 +1079,7 @@ pages_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/pages.example.com.key"
 ##! Docs: https://docs.gitlab.com/omnibus/gitlab-mattermost
 ################################################################################
 
-# mattermost_external_url 'http://mattermost.example.com'
+ mattermost_external_url 'https://mattermost.example.com'
 
 # mattermost['enable'] = false
 # mattermost['username'] = 'mattermost'
@@ -1101,7 +1101,7 @@ pages_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/pages.example.com.key"
 # mattermost['service_enable_post_icon_override'] = true
 # mattermost['service_enable_testing'] = false
 # mattermost['service_enable_security_fix_alert'] = true
-# mattermost['service_enable_insecure_outgoing_connections'] = false
+mattermost['service_enable_insecure_outgoing_connections'] = true
 # mattermost['service_allowed_untrusted_internal_connections'] = ""
 # mattermost['service_allow_cors_from'] = ""
 # mattermost['service_enable_outgoing_webhooks'] = true
