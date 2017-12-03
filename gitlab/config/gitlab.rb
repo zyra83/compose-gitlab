@@ -441,7 +441,7 @@ external_url 'https://gitlab.example.com'
 ##! Docs: https://docs.gitlab.com/ce/administration/container_registry.html
 ################################################################################
 
-# registry_external_url 'https://registry.gitlab.example.com'
+registry_external_url 'https://registry.gitlab.example.com'
 
 ### Settings used by GitLab application
 # gitlab_rails['registry_enabled'] = true
