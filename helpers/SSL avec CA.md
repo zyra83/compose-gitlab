@@ -2,25 +2,56 @@
 
 # TL;DR;
 ``` bash
+# On va avoir besoin de ce fichier par la suite
+cat << EOF > ma_config_openssl.cnf 
+[ req ]
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+req_extensions     = v3_req
+prompt = no
+default_md = sha256
+
+[ req_distinguished_name ]
+countryName                = FR
+stateOrProvinceName        = Landes
+localityName               = Geloux
+organizationName           = FlashCorp.
+commonName                 = gitlab.example.com
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1   = gitlab.example.com
+DNS.2   = pages.gitlab.example.com
+EOF
+# génération des DH au besoin
+openssl dhparam -out dhparam.pem 2048
 # clé privée du CA
 openssl genrsa -out "ca.key" 2048
 chmod 400 "ca.key"
 # autosignature du CA
-openssl req -new -x509 -days 3650 -key "ca.key" -out "ca.crt" -subj "/C=FR/ST=Landes/L=Geloux/O=Flash Corp./OU=IT Department/CN=Flash Corp. Certification Autority (FCCA \o/)"
+openssl req -new -x509 -days 3650 -key "ca.key" -out "ca.crt" -subj "/C=FR/ST=Landes/L=Geloux/O=Flash Corp./OU=IT Department/CN=Flash Corp. Certification Autority"
 # clé privée du serveur
 openssl genrsa -out "gitlab.example.com.key" 2048
 chmod 400 "gitlab.example.com.key"
 # Demande de signature (csr) version non-interactive
-openssl req -new -key "gitlab.example.com.key" -out "gitlab.example.com.csr" -subj "/C=FR/ST=Landes/L=Geloux/O=Flash Corp./OU=IT Department/CN=gitlab.example.com"
-# signature du CSR par le CA
-openssl x509 -req -in "gitlab.example.com.csr" -out "gitlab.example.com.crt" -CA "ca.crt" -CAkey "ca.key" -CAcreateserial -days 365
+openssl req -new -key "gitlab.example.com.key" -out "gitlab.example.com.csr" -config ma_config_openssl.cnf
+# signature du CSR par le CA (et rappel de config, bug openssl ? )
+openssl x509 -req -in "gitlab.example.com.csr" -out "gitlab.example.com.crt" -CA "ca.crt" -CAkey "ca.key" -CAcreateserial -days 365 -extensions v3_req -extfile ma_config_openssl.cnf 
 ```
 
 http://webdevpro.net/https-mise-en-place-dun-certicat-auto-signe/
 # Lexique
 
-http://www.gtopia.org/blog/2010/02/der-vs-crt-vs-cer-vs-pem-certificates/
-https://fr.wikipedia.org/wiki/Demande_de_signature_de_certificat
+- http://www.gtopia.org/blog/2010/02/der-vs-crt-vs-cer-vs-pem-certificates/
+- https://fr.wikipedia.org/wiki/Demande_de_signature_de_certificat
+- https://serverfault.com/questions/845806/how-to-issue-ssl-certificate-with-san-extension
+- https://gist.github.com/bradmontgomery/6487319
+- https://www.digicert.com/csr-ssl-installation/nginx-openssl.htm
+
 
 **Certificate Signing Request** : extension .csr, fichier de demande de signature d'un certificat. Il donne lieu à la création d'un .c(e)rt une fois signé par l'autorité de certification
 
