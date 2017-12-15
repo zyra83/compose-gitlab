@@ -1,0 +1,16 @@
+/gitlab/data
+/gitlab/logs
+
+gitlab/config/gitlab-secrets\.json
+
+gitlab/config/ssh_host_ecdsa_key
+
+gitlab/config/ssh_host_ecdsa_key\.pub
+
+gitlab/config/ssh_host_ed25519_key
+
+gitlab/config/ssh_host_ed25519_key\.pub
+
+gitlab/config/ssh_host_rsa_key
+
+gitlab/config/ssh_host_rsa_key\.pub
